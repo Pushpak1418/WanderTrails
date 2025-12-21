@@ -43,6 +43,14 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
   const payload = isJson ? await res.json().catch(() => null) : await res.text().catch(() => '')
 
   if (!res.ok) {
+    // Helpful message for common deployment misconfiguration
+    if (res.status === 405) {
+      throw new ApiError(
+        `Request failed (405). This often means the request reached an endpoint that doesn't accept the HTTP method. On deployments this can happen when your frontend is hitting the wrong server (for example, the backend is not deployed or "NEXT_PUBLIC_API_URL" is not set). Ensure your backend is reachable and that you're proxying /auth requests to it (or set NEXT_PUBLIC_API_URL to your backend URL).`,
+        405,
+      )
+    }
+
     const message =
       (payload && typeof payload === 'object' && 'error' in payload && typeof (payload as any).error === 'string'
         ? (payload as any).error

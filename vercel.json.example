@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/auth/:path*",
+      "destination": "https://YOUR_BACKEND_URL.example.com/auth/:path*"
+    }
+  ]
+}

@@ -116,3 +116,14 @@ If you prefer a `profiles` table, we can add that next (recommended for personal
 ## Notes for future changes
 
 When you ask for new features (saved journeys, intent memory, chatbot personalization), we’ll append design/architecture notes and the implementation summary to the **Implementation log** section above.
+
+## Deploying to Vercel — common pitfalls
+
+- Required env vars (set these in the Vercel Project Settings > Environment Variables):
+	- `NEXT_PUBLIC_API_URL`: full URL to your auth backend (e.g. `https://auth.example.com`) — if omitted in production the frontend will use relative paths and must be proxied to a backend.
+	- `JWT_SECRET` and any server-side secrets used by your backend (on the backend deployment).
+
+- If your backend is hosted separately, set `NEXT_PUBLIC_API_URL` to that backend URL.
+- If you want the frontend to proxy `/auth` to an external backend from the same Vercel deployment, add a `vercel.json` rewrite like the example in `vercel.json.example`.
+
+If you see `Request failed (405)` from the frontend on deploy, it usually means the request reached an endpoint that doesn't accept the HTTP method — commonly because the frontend is hitting the wrong service (for example, the backend is not reachable or `NEXT_PUBLIC_API_URL` is unset and the route isn't proxied). Configure `NEXT_PUBLIC_API_URL` or add a rewrite to fix it.
