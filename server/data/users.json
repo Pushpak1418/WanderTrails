@@ -22,6 +22,13 @@
       "email": "exp@gmail.com",
       "passwordHash": "$2a$10$mWSz6DBI11gXvDhqlqtQ2eJ2WINYacT9jwy4F9CSEZ0kfv4sNzvp.",
       "createdAt": "2025-12-21T07:30:07.250Z"
+    },
+    {
+      "id": "DMPd8hHodxrNIMbDyoYV6",
+      "name": "mini",
+      "email": "mini@gmail.com",
+      "passwordHash": "$2a$10$m/v0LTPK.9czsFm30ZPfte1.yHHdurkDzYfBzDdlRF9ZLQSl8Ux3O",
+      "createdAt": "2025-12-21T15:08:02.195Z"
     }
   ]
 }

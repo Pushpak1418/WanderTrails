@@ -12,9 +12,11 @@ type ApiFetchOptions = Omit<RequestInit, 'body'> & {
 }
 
 export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
-  // In dev, default to the local auth server to prevent "env not found" footguns.
-  // In production you should always set NEXT_PUBLIC_API_URL explicitly.
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
+  // Prefer an explicit `NEXT_PUBLIC_API_URL`.
+  // If missing, default to localhost in development, otherwise use a relative path in production
+  // so the deployed frontend does not try to contact `http://localhost:4000`.
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL ?? (process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '')
 
   let res: Response
   try {
@@ -29,7 +31,9 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
     })
   } catch {
     throw new ApiError(
-      `Could not reach the auth server at ${baseUrl}. Make sure the backend is running and CORS is configured for this origin.`,
+      baseUrl
+        ? `Could not reach the auth server at ${baseUrl}. Make sure the backend is running and CORS is configured for this origin.`
+        : `Could not reach the auth server. Requests are being sent to a relative path; ensure your backend is reachable from this deployment and proxying/CORS is configured.`,
       0,
     )
   }

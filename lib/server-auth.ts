@@ -28,7 +28,10 @@ export async function getCurrentUser(): Promise<ServerAuthUser | null> {
   }
 
   // Fallback to local Express auth server (cookie-based)
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
+  // Use explicit `NEXT_PUBLIC_API_URL` when provided. In development default to localhost,
+  // but in production use a relative path so the deployed frontend doesn't try to contact localhost.
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_URL ?? (process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '')
 
   // Next.js 16: cookies() is async
   const cookieStore = await cookies()
