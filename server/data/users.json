@@ -1,0 +1,20 @@
+{
+  "users": [
+    {
+      "id": "3l3ExkRpkSQcgkd_xEIzv",
+      "name": "Rudraksh",
+      "email": "grudraksh2007@gmail.com",
+      "passwordHash": "$2a$10$j6N0bGU/z9Tp14gkmvhxjuG.wXHGymvrF7czh9MXSZpitWuSIH4iK",
+      "createdAt": "2025-12-18T14:58:36.636Z",
+      "resetTokenHash": "c6eb995f57dfe4dd95990c22ea61ad80f76545f556b473d21943ecd6eae6fae5",
+      "resetTokenExpiresAt": "2025-12-20T19:36:04.806Z"
+    },
+    {
+      "id": "0-bLzPxQmRslwh6khnCwT",
+      "name": "Gian",
+      "email": "grxdbingg@gmail.com",
+      "passwordHash": "$2a$10$2hWc7rVW5E2m5BKxduv5Y.XnhmWCj4phdYyfU9Wqw9HAjOBJGPUwm",
+      "createdAt": "2025-12-20T18:57:13.426Z"
+    }
+  ]
+}
