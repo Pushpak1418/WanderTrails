@@ -1,0 +1,61 @@
+Vercel backend URL & deployment checklist
+
+1) Set backend URL in Vercel (UI)
+   - Project → Settings → Environment Variables
+   - Name: NEXT_PUBLIC_API_URL
+   - Value: https://your-backend.example.com  (include https://)
+   - Environment: Production (and Preview if you want)
+   - Save and redeploy the project
+
+2) Set backend URL in Vercel (CLI)
+   - Install/login: `npm i -g vercel` then `vercel login`
+   - Add var:
+     - Interactive: `vercel env add NEXT_PUBLIC_API_URL production`
+     - Non-interactive: `vercel env add NEXT_PUBLIC_API_URL https://your-backend.example.com production`
+
+3) Redeploy methods
+   - Dashboard: Deployments → Latest deployment → Redeploy
+   - Git: commit & push to the branch Vercel watches (e.g., `git commit --allow-empty -m "redeploy" && git push`)
+   - CLI: `vercel --prod`
+
+4) If you prefer proxying from the frontend deployment
+   - Option A (vercel.json rewrite): add `vercel.json` with:
+     {
+       "rewrites": [
+         { "source": "/auth/:path*", "destination": "https://YOUR_BACKEND_URL.example.com/auth/:path*" }
+       ]
+     }
+   - Option B (App Router proxy): we added `app/auth/[...path]/route.ts` and `app/api/auth/[...path]/route.ts` which forward `/auth/*` requests to `NEXT_PUBLIC_API_URL`. Ensure `NEXT_PUBLIC_API_URL` is set to the backend origin.
+
+5) Verify after deploy
+   - Browser DevTools → Network → perform an auth action.
+     - Confirm Request URL is either proxied (`https://<your-vercel-app>/auth/...`) or points to your backend (`https://your-backend.example.com/auth/...`).
+     - Confirm method (GET/POST) matches the backend route (`POST /auth/login`, `GET /auth/me`, etc.).
+   - Vercel Logs: Project → Deployments → View Logs for the deployment.
+
+6) Common causes of `Request failed (405)` and fixes
+   - Wrong target service: frontend hitting a static host or incorrect service — set `NEXT_PUBLIC_API_URL` to the real API endpoint.
+   - Missing proxy: either configure `vercel.json` rewrites or rely on the included App Router proxy route and set `NEXT_PUBLIC_API_URL`.
+   - Method mismatch: confirm the frontend is sending the correct HTTP method (e.g., `POST` for `/auth/login`). Check browser network tab.
+   - Backend returns 405: check backend routes and CORS. If backend blocks unknown origins or methods, allow your frontend origin and required methods, and enable credentials if cookies are used.
+
+7) Backend CORS notes (Express example)
+   - Example middleware:
+     const cors = require('cors')
+     app.use(cors({ origin: ['https://your-vercel-app.vercel.app'], credentials: true }))
+   - Ensure `credentials: true` when using cookies and that frontend requests use `credentials: 'include'`.
+
+8) Quick commands you can run locally (optional)
+   - Trigger redeploy via git:
+     git commit --allow-empty -m "trigger redeploy"
+     git push
+   - Or deploy directly with Vercel CLI:
+     vercel --prod
+
+9) If problem persists — what to share with me
+   - Exact failing request (method + URL) from browser network tab
+   - Vercel deployment logs for the request or function logs
+   - The value you set for `NEXT_PUBLIC_API_URL` (hide secrets) so I can verify formatting
+
+---
+If you want, paste your backend URL here and I'll add a `vercel.json` rewrite file and push it for you.
