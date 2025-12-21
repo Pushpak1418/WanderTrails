@@ -1,0 +1,67 @@
+Connecting Frontend (Vercel) to Backend — step-by-step
+
+1) Purpose
+   - Set the frontend environment variable `NEXT_PUBLIC_API_URL` so the deployed frontend knows where to send `/auth/*` requests.
+
+2) Recommended values
+   - `NEXT_PUBLIC_API_URL`: `https://your-backend.vercel.app` (include `https://`, no trailing slash).
+   - (Optional) If using Supabase: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+
+3) Set the env var in the Vercel dashboard (UI)
+   - Go to vercel.com → your Frontend Project → **Settings** → **Environment Variables**.
+   - Click **Add** and enter:
+     - Name: `NEXT_PUBLIC_API_URL`
+     - Value: `https://your-backend.vercel.app`
+     - Environment: **Production** (also add for Preview/Development if you want those environments to use the same backend)
+   - Save and redeploy the frontend.
+
+4) Set the corresponding backend envs (BACKEND project)
+   - In your Backend Vercel project, ensure `CLIENT_ORIGIN` includes the frontend origin (e.g. `https://your-frontend.vercel.app`) and `JWT_SECRET` is set.
+   - Redeploy the backend if you change backend envs.
+
+5) Local development
+   - In the frontend repo root, create/update `.env.local`:
+     ```env
+     NEXT_PUBLIC_API_URL=http://localhost:4000
+     ```
+   - Start backend locally: `cd backend && npm install && npm run dev`
+   - Start frontend: `npm run dev` (or your normal dev command)
+
+6) Redeploy methods
+   - Dashboard: Deployments → Latest deployment → Redeploy
+   - Git push (project connected to GitHub):
+     ```bash
+     git commit --allow-empty -m "trigger frontend redeploy"
+     git push
+     ```
+   - CLI: `vercel --prod`
+
+7) Verification after deploy
+   - Browser DevTools → Network tab
+     - Trigger a login/forgot-password action and inspect the request URL: it should be either
+       - `https://your-backend.vercel.app/auth/...` (direct), or
+       - `https://your-frontend.vercel.app/auth/...` (if you use a proxy/rewrite).
+     - Confirm response status is 200/201 and that a `Set-Cookie` header is present on login.
+   - Health check: open `https://your-backend.vercel.app/health` — expected response: `{"ok":true}`
+
+8) CORS & cookies checklist
+   - Backend `CLIENT_ORIGIN` must include the frontend origin.
+   - Backend must enable CORS with `credentials: true` (server code already does this when `CLIENT_ORIGIN` is set).
+   - Frontend requests use cookies: `credentials: 'include'` (client code already sets this).
+   - Cookies are `secure` in production; use `https` origins.
+
+9) Common errors and fixes
+   - Request failed (405): frontend is hitting the wrong endpoint or backend returned method-not-allowed. Verify `NEXT_PUBLIC_API_URL` and request method.
+   - Could not reach backend / 502: `NEXT_PUBLIC_API_URL` incorrect or backend not deployed; check Vercel deployment logs.
+   - CORS errors / missing cookies: ensure `CLIENT_ORIGIN` set on backend and `credentials: true` allowed.
+
+10) Quick commands to set env via Vercel CLI
+   ```bash
+   # add for production
+   vercel env add NEXT_PUBLIC_API_URL https://your-backend.vercel.app production
+   # or set value interactively
+   vercel env add NEXT_PUBLIC_API_URL production
+   ```
+
+11) If you'd like me to fill in values
+   - Paste your frontend URL and backend URL and I will create a `vercel.json` rewrite example and double-check the correct env settings to use.
