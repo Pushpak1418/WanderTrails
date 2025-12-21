@@ -15,6 +15,13 @@
       "email": "grxdbingg@gmail.com",
       "passwordHash": "$2a$10$2hWc7rVW5E2m5BKxduv5Y.XnhmWCj4phdYyfU9Wqw9HAjOBJGPUwm",
       "createdAt": "2025-12-20T18:57:13.426Z"
+    },
+    {
+      "id": "J_-IFwkwt2Ag8sPhuDg9S",
+      "name": "trailer",
+      "email": "exp@gmail.com",
+      "passwordHash": "$2a$10$mWSz6DBI11gXvDhqlqtQ2eJ2WINYacT9jwy4F9CSEZ0kfv4sNzvp.",
+      "createdAt": "2025-12-21T07:30:07.250Z"
     }
   ]
 }
