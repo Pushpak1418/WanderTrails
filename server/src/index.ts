@@ -32,7 +32,11 @@ const env = getEnv()
 
 const app = express()
 
-const allowedOrigins = env.CLIENT_ORIGIN.split(',').map((s) => s.trim()).filter(Boolean)
+const allowedOrigins = env.CLIENT_ORIGIN
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean)
+  .map((o) => o.replace(/\/$/, ''))
 
 app.use(
   cors({
@@ -40,14 +44,20 @@ app.use(
       // Allow non-browser clients (curl, server-to-server)
       if (!origin) return callback(null, true)
 
-      // Allow explicit origins
-      if (allowedOrigins.includes(origin)) return callback(null, true)
+      const normalizedOrigin = origin.replace(/\/$/, '')
+
+      // Allow explicit origins (compare normalized)
+      if (allowedOrigins.includes(normalizedOrigin)) return callback(null, true)
 
       // In dev, allow any localhost port to prevent "Next picked a different port" CORS issues.
       if (env.NODE_ENV !== 'production') {
-        const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+        const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin)
         if (isLocalhost) return callback(null, true)
       }
+
+      // Log details to help debugging on the server side
+      // eslint-disable-next-line no-console
+      console.warn('CORS rejection: origin=', origin, 'allowed=', allowedOrigins)
 
       return callback(null, false)
     },
